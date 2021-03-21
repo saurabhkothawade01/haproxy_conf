@@ -1,0 +1,42 @@
+- hosts: load_balancer
+  tasks:
+          - name: "Installing Haproxy Software"        
+            package:
+               name: haproxy
+               state: present
+
+          - name: "Copy file"
+            template:
+               src: "haproxy.cfg"
+               dest: /etc/haproxy/haproxy.cfg
+
+
+          - name: "Started Haproxy Service"
+            service: 
+               name: haproxy
+               state: started
+            notify: "Haproxy_restart"   
+
+  handlers:
+  - name: "Haproxy_restart"
+    service:
+            name: haproxy
+            state: restarted          
+
+
+- hosts: web
+  tasks:
+          - name: "Installing HTTPD Software"
+            package:
+               name: httpd
+               state: present
+ 
+          - name: "Copy Files"
+            copy:
+               dest: /var/www/html/
+               src: index.html
+
+          - name: "Started Web Service"
+            service: 
+               name: "httpd"
+               state: started
